@@ -1,0 +1,170 @@
+# terraform.tfvars.example
+# Copy this file to terraform.tfvars and customize the values
+
+# =============================================================================
+# REQUIRED BASIC CONFIGURATION
+# =============================================================================
+
+# Subscription Id
+subscription_id = "<subscription_id>"
+
+# Resource group name (must be unique)
+resource_group_name = "rg-my-azure-project"
+
+# Region where to create resources
+# Common options: "East US", "West Europe", "Southeast Asia"
+location = "East US"
+
+# Virtual machine name
+vm_name = "my-ubuntu-vm"
+
+# VM size
+# Common options: "Standard_B1s", "Standard_B2s", "Standard_D2s_v3"
+vm_size = "Standard_B2s"
+
+# =============================================================================
+# USER CONFIGURATION
+# =============================================================================
+
+# Administrator username
+admin_username = "azureuser"
+
+# Option 1: Use SSH Key (RECOMMENDED)
+disable_password_authentication = true
+public_key_path                = "~/.ssh/id_rsa.pub"
+
+# Option 2: Use password (LESS SECURE)
+# disable_password_authentication = false
+# admin_password = "YourSuperSecurePassword123!"
+
+# =============================================================================
+# NETWORK CONFIGURATION
+# =============================================================================
+
+# Create public IP
+enable_public_ip = true
+
+# Public IP allocation type
+public_ip_allocation_method = "Static"
+
+# Virtual network address range
+vnet_address_space = ["10.1.0.0/16"]
+
+# Subnet address range
+subnet_address_prefixes = ["10.1.1.0/24"]
+
+# =============================================================================
+# STORAGE CONFIGURATION
+# =============================================================================
+
+# OS disk cache type
+os_disk_caching = "ReadWrite"
+
+# Storage type
+# "Standard_LRS" - Standard HDD (cheapest)
+# "StandardSSD_LRS" - Standard SSD (balanced)
+# "Premium_LRS" - Premium SSD (fastest)
+os_disk_storage_account_type = "Premium_LRS"
+
+# =============================================================================
+# OPERATING SYSTEM
+# =============================================================================
+
+# Ubuntu 22.04 LTS (default)
+source_image_reference = {
+  publisher = "Canonical"
+  offer     = "0001-com-ubuntu-server-jammy"
+  sku       = "22_04-lts-gen2"
+  version   = "latest"
+}
+
+# Ubuntu 20.04 LTS
+# source_image_reference = {
+#   publisher = "Canonical"
+#   offer     = "0001-com-ubuntu-server-focal"
+#   sku       = "20_04-lts-gen2"
+#   version   = "latest"
+# }
+
+# CentOS 8
+# source_image_reference = {
+#   publisher = "OpenLogic"
+#   offer     = "CentOS"
+#   sku       = "8_5"
+#   version   = "latest"
+# }
+
+# Red Hat Enterprise Linux 8
+# source_image_reference = {
+#   publisher = "RedHat"
+#   offer     = "RHEL"
+#   sku       = "8-LVM"
+#   version   = "latest"
+# }
+
+# =============================================================================
+# SECURITY RULES (FIREWALL)
+# =============================================================================
+
+network_security_group_rules = [
+  # SSH (port 22)
+  {
+    name                       = "SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  },
+  # HTTP (port 80)
+  {
+    name                       = "HTTP"
+    priority                   = 1002
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  },
+  # HTTPS (port 443)
+  {
+    name                       = "HTTPS"
+    priority                   = 1003
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  # Add more rules if needed
+  # {
+  #   name                       = "Custom-App"
+  #   priority                   = 1004
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "8080"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
+]
+
+# =============================================================================
+# TAGS
+# =============================================================================
+
+tags = {
+  Environment = "Development"
+  Project     = "Azure-VM-Sample"
+  ManagedBy   = "Terraform"
+  Owner       = "My-Team"
+  CostCenter  = "IT-Department"
+}
