@@ -55,3 +55,13 @@ output "ssh_public_key" {
   description = "Generated SSH public key for VM access"
   value       = tls_private_key.ssh_key.public_key_openssh
 }
+
+output "custom_script_status" {
+  description = "Status of the custom script extension"
+  value       = var.enable_custom_script ? "Enabled - Script will execute on VM creation" : "Disabled"
+}
+
+output "script_execution_command" {
+  description = "Command executed by the custom script extension"
+  value       = var.enable_custom_script ? var.script_command : null
+}

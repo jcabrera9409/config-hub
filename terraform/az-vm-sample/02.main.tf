@@ -132,3 +132,22 @@ resource "azurerm_linux_virtual_machine" "main" {
     public_key = tls_private_key.ssh_key.public_key_openssh
   }
 }
+
+# Custom Script Extension to run initialization scripts
+resource "azurerm_virtual_machine_extension" "custom_script" {
+  count                = var.enable_custom_script ? 1 : 0
+  name                 = "${var.vm_name}-custom-script"
+  virtual_machine_id   = azurerm_linux_virtual_machine.main.id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.1"
+  tags                 = var.tags
+
+  settings = jsonencode({
+    script = base64encode(templatefile(var.script_file_path, {
+      admin_username = var.admin_username
+    }))
+  })
+
+  depends_on = [azurerm_linux_virtual_machine.main]
+}

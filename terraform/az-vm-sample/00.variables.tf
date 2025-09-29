@@ -156,3 +156,28 @@ variable "tags" {
     ManagedBy   = "Terraform"
   }
 }
+
+# Custom Script Extension Variables
+variable "enable_custom_script" {
+  description = "Enable Custom Script Extension to run scripts on VM creation"
+  type        = bool
+  default     = true
+}
+
+variable "script_file_path" {
+  description = "Local path to the script file to be executed"
+  type        = string
+  default     = "./scripts/setup.sh"
+}
+
+variable "script_command" {
+  description = "Command to execute the script"
+  type        = string
+  default     = "bash setup.sh"
+}
+
+variable "script_timeout" {
+  description = "Script execution timeout in seconds"
+  type        = number
+  default     = 600
+}

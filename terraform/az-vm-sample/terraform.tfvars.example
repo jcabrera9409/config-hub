@@ -168,3 +168,19 @@ tags = {
   Owner       = "My-Team"
   CostCenter  = "IT-Department"
 }
+
+# =============================================================================
+# CUSTOM SCRIPT EXTENSION CONFIGURATION
+# =============================================================================
+
+# Enable automatic script execution on VM creation
+enable_custom_script = true
+
+# Path to your initialization script (relative to Terraform files)
+script_file_path = "./scripts/setup.sh"
+
+# Command to execute the script
+script_command = "bash setup.sh"
+
+# Script execution timeout in seconds (default: 600 seconds = 10 minutes)
+script_timeout = 600

@@ -6,6 +6,7 @@ This project creates a Linux virtual machine in Azure using Terraform with autom
 
 - **Linux Virtual Machine**: Ubuntu 22.04 LTS by default
 - **Automated SSH Key Generation**: Automatically generates and saves SSH keys locally
+- **Custom Script Extension**: Automatically executes initialization scripts on VM creation
 - **Virtual Network**: Configurable VNet and subnet with custom address spaces
 - **Security**: Network Security Group with customizable firewall rules
 - **Public IP**: Optional static or dynamic public IP allocation
@@ -49,6 +50,35 @@ az account set --subscription "your-subscription-id"
 - Saves the private key to `ssh_keys/{vm_name}_private_key.pem`
 - Saves the public key to `ssh_keys/{vm_name}_public_key.pub`
 - Configures the VM with the generated public key
+
+### 🔧 Custom Script Extension
+
+La configuración incluye **Custom Script Extension** que ejecuta automáticamente scripts de inicialización cuando se crea la VM:
+
+#### Script Incluido:
+- **`scripts/setup.sh`**: Script principal de inicialización que:
+  - Actualiza los paquetes del sistema
+  - Instala herramientas esenciales (curl, git, docker, etc.)
+  - Configura zona horaria y firewall
+  - Configura Docker y Docker Compose
+  - Crea directorios para aplicaciones
+
+#### Cómo usar Custom Scripts:
+
+1. **Usar el script por defecto** - Funciona inmediatamente con configuración general del sistema
+2. **Modificar el script existente** - Edita `scripts/setup.sh` según tus necesidades
+3. **Crear tu propio script** - Crea nuevos scripts y actualiza `terraform.tfvars`:
+   ```hcl
+   script_file_path = "./scripts/mi-script-personalizado.sh"
+   script_command = "bash mi-script-personalizado.sh"
+   ```
+4. **Deshabilitar scripts** - Configura `enable_custom_script = false` en `terraform.tfvars`
+
+#### Ejecución del Script:
+- Los scripts se ejecutan como usuario **root** automáticamente
+- Timeout de ejecución: 10 minutos por defecto (configurable)
+- La salida del script se registra en el portal de Azure bajo VM Extensions
+- Los scripts se ejecutan después de que la VM esté completamente aprovisionada
 
 ## 🛠️ Usage
 
@@ -127,6 +157,10 @@ ssh -i ssh_keys/my-ubuntu-vm_private_key.pem azureuser@<PUBLIC_IP>
 | `enable_public_ip` | Create public IP | `true` | No |
 | `public_ip_allocation_method` | IP allocation method | `Static` | No |
 | `os_disk_storage_account_type` | Storage account type | `Premium_LRS` | No |
+| `enable_custom_script` | Enable automatic script execution | `true` | No |
+| `script_file_path` | Path to initialization script | `./scripts/setup.sh` | No |
+| `script_command` | Command to execute script | `bash setup.sh` | No |
+| `script_timeout` | Script execution timeout (seconds) | `600` | No |
 
 ### Available VM Sizes
 
@@ -228,6 +262,57 @@ os_disk_storage_account_type = "StandardSSD_LRS"
 os_disk_storage_account_type = "Standard_LRS"
 ```
 
+### Configure Custom Script Extension
+
+La Custom Script Extension permite configurar automáticamente tu VM durante el despliegue.
+
+#### Configuración Básica (Por defecto)
+```hcl
+# Usa el script setup.sh incluido
+enable_custom_script = true
+script_file_path = "./scripts/setup.sh"
+script_command = "bash setup.sh"
+```
+
+#### Configuración Personalizada
+```hcl
+# Usar tu propio script personalizado
+enable_custom_script = true
+script_file_path = "./scripts/mi-configuracion.sh"
+script_command = "bash mi-configuracion.sh"
+script_timeout = 1200  # 20 minutos para configuraciones complejas
+```
+
+#### Deshabilitar Ejecución de Scripts
+```hcl
+# Deshabilitar ejecución automática de scripts
+enable_custom_script = false
+```
+
+#### Crear Scripts Personalizados
+
+1. **Crea tu archivo de script** en el directorio `scripts/`:
+```bash
+#!/bin/bash
+# Tus comandos de configuración personalizada aquí
+apt-get update
+apt-get install -y tu-paquete
+# Configurar tu aplicación
+```
+
+2. **Actualiza terraform.tfvars**:
+```hcl
+script_file_path = "./scripts/tu-script.sh"
+script_command = "bash tu-script.sh"
+```
+
+#### Buenas Prácticas para Scripts
+- Siempre comenzar scripts con `#!/bin/bash`
+- Usar `set -e` para salir en caso de errores
+- Probar scripts manualmente antes de usarlos
+- Mantener scripts idempotentes (pueden ejecutarse múltiples veces de forma segura)
+- Registrar acciones importantes para resolución de problemas
+
 ## 📤 Outputs
 
 After successful deployment, the following outputs are available:
@@ -248,6 +333,10 @@ After successful deployment, the following outputs are available:
 - `ssh_connection_command`: Ready-to-use SSH command for connecting to the VM
 - `ssh_private_key`: Generated SSH private key (marked as sensitive)
 - `ssh_public_key`: Generated SSH public key
+
+### Custom Script Extension
+- `custom_script_status`: Shows if Custom Script Extension is enabled/disabled
+- `script_execution_command`: The command executed by the script extension
 
 ### Example Output Usage
 
