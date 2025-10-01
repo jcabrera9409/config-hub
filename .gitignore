@@ -60,3 +60,7 @@ terraform.rc
 
 ssh_keys/
 .terraform/
+
+*_nogit
+
+.DS_store

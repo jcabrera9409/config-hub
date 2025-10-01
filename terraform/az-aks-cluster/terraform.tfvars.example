@@ -1,0 +1,90 @@
+# terraform.tfvars.example
+# Copy this file to terraform.tfvars and customize the values
+
+# =============================================================================
+# REQUIRED BASIC CONFIGURATION
+# =============================================================================
+
+# Azure Subscription ID (required)
+subscription_id = "<your-subscription-id>"
+
+# Resource group name (must be unique within subscription)
+resource_group_name = "rg-aks-dev-cluster"
+
+# Azure region where to create resources
+# Common cost-effective options: "East US", "West Europe", "South Central US"
+location = "East US"
+
+# AKS cluster name
+cluster_name = "aks-dev-cluster"
+
+# =============================================================================
+# CLUSTER CONFIGURATION (Optional - defaults provided)
+# =============================================================================
+
+# Kubernetes version (leave default for latest stable)
+# kubernetes_version = "1.27.3"
+
+# Node configuration for cost optimization
+node_count = 1                # Start with 1 node for testing
+node_vm_size = "Standard_B2s" # Cost-effective VM size (2 vCPUs, 4GB RAM)
+
+# Auto-scaling configuration (optional)
+enable_auto_scaling = false
+# min_count = 1
+# max_count = 3
+
+# OS disk size (30GB is sufficient for basic workloads)
+# os_disk_size_gb = 30
+
+# =============================================================================
+# NETWORK CONFIGURATION (Optional - defaults provided)
+# =============================================================================
+
+# Virtual network address space
+# vnet_address_space = ["10.0.0.0/16"]
+
+# Subnet for AKS nodes
+# subnet_address_prefixes = ["10.0.1.0/24"]
+
+# Network plugin (kubenet is more cost-effective than azure)
+# network_plugin = "kubenet"
+
+# =============================================================================
+# FEATURES CONFIGURATION (Optional - defaults provided)
+# =============================================================================
+
+# Enable RBAC (recommended)
+# enable_rbac = true
+
+# Enable Azure Policy (adds cost - disable for testing)
+# enable_azure_policy = false
+
+# Enable container monitoring (adds cost - disable for basic testing)
+# enable_oms_agent = false
+
+# =============================================================================
+# TAGS (Optional)
+# =============================================================================
+
+# tags = {
+#   Environment = "Development"
+#   Project     = "AKS-Testing"
+#   Owner       = "DevOps-Team"
+#   CostCenter  = "IT-Development"
+# }
+
+# =============================================================================
+# COST OPTIMIZATION NOTES
+# =============================================================================
+
+# For minimal cost testing environment:
+# - Use Standard_B2s VM size (cheapest option with decent performance)
+# - Start with 1 node, scale up as needed
+# - Disable monitoring and Azure Policy initially
+# - Use kubenet network plugin instead of Azure CNI
+# - Use standard load balancer SKU
+# - Keep auto-scaling disabled initially
+
+# Estimated monthly cost with default settings: ~$70-100 USD
+# (Costs may vary by region and Azure pricing changes)
