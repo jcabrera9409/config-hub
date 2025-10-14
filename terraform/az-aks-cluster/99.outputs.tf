@@ -79,3 +79,22 @@ output "subnet_id" {
   description = "ID of the AKS subnet"
   value       = azurerm_subnet.aks.id
 }
+
+output "cluster_public_ip" {
+  description = "Public IP address of the AKS cluster load balancer"
+  value = try(
+    tolist(azurerm_kubernetes_cluster.main.network_profile[0].load_balancer_profile[0].effective_outbound_ips)[0],
+    "No public IP available - cluster may use managed outbound connectivity"
+  )
+}
+
+# Data source to get all public IPs in the node resource group
+data "azurerm_public_ips" "aks_outbound" {
+  depends_on          = [azurerm_kubernetes_cluster.main]
+  resource_group_name = azurerm_kubernetes_cluster.main.node_resource_group
+}
+
+output "aks_outbound_ip" {
+  description = "Actual outbound public IP address used by AKS"
+  value       = try(data.azurerm_public_ips.aks_outbound.public_ips[0].ip_address, "IP not found or not yet created")
+}
